@@ -5,7 +5,7 @@ const btnHtml = document.getElementById("btn");
 let cards = [];
 const cardsPics = [];
 let cardsSelected = [];
-let cardsNb = 12;
+let cardsNb = 24;
 let cardLeft;
 let score = 0;
 btnHtml.addEventListener("click", () => start());
@@ -136,6 +136,7 @@ const start = () => {
   btnHtml.innerText = "Recommencer";
   infoHtml.innerText = "";
   scoreHtml.innerText = "";
+  cardsSelected = [];
   score = 0;
   cardLeft = cardsNb;
   cards = [];
