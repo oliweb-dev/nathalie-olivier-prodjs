@@ -7,11 +7,6 @@ let isSelected = false;
 let result = undefined;
 const game = new Game(6);
 
-const displayResults = (attempts, timeInSeconds) => {
-   infoHtml.innerText = `Bravo, vous avez gagné  !`;
-   scoreHtml.innerHTML = `Stats: ${attempts} coups et ${timeInSeconds} secondes`;
-};
-
 const setCardToRed = (id) => {
    const cardHtml = document.getElementById(`card-${id}`);
    cardHtml.classList.replace("cardGreen", "cardRed");
@@ -32,7 +27,7 @@ const addEventCard = (id) => {
 const hideValueCard = (id) => {
    const card = game.getCard(id);
    const cardHtml = document.getElementById(`card-${card.id}`);
-   cardHtml.innerHTML = card.picture.img;
+   cardHtml.innerHTML = ""; //card.picture.img;
    cardHtml.classList.remove("cardGreen", "cardRed");
    cardHtml.classList.add("cardBack");
 };
@@ -42,6 +37,66 @@ const displayValueCard = (id) => {
    const cardHtml = document.getElementById(`card-${card.id}`);
    cardHtml.innerHTML = card.picture.img;
    cardHtml.classList.replace("cardBack", "cardGreen");
+};
+
+const displayResults = (attempts) => {
+   let endTime = Date.now();
+   let timeInSeconds = Math.floor((endTime - startTime) / 1000);
+   infoHtml.innerText = `Bravo, vous avez gagné  !`;
+   scoreHtml.innerHTML = `Stats: ${attempts} coups et ${timeInSeconds} secondes`;
+};
+
+const notFound = (result) => {
+   for (let c of result.selectedCards) {
+      setCardToRed(c.card.id);
+   }
+   setTimeout(() => {
+      for (let c of result.selectedCards) {
+         hideValueCard(c.card.id);
+         addEventCard(c.card.id);
+         isSelected = false;
+      }
+   }, 2000);
+};
+
+const win = (result) => {
+   displayResults(result.attempts);
+   isSelected = false;
+};
+
+const handleClick = (event) => {
+   const idHtml = event.currentTarget.id;
+   const id = parseInt(idHtml.split("-").at(1));
+   if (!isSelected) {
+      displayValueCard(id);
+      removeEventCard(id);
+      result = game.checkSelectedCards(id);
+   }
+   if (typeof result !== "undefined" && !isSelected) {
+      isSelected = true;
+      switch (result.state) {
+         case "found":
+            isSelected = false;
+            break;
+         case "notFound":
+            notFound(result);
+            break;
+         case "win":
+            win(result);
+            break;
+      }
+   }
+};
+
+const displayGame = (cards) => {
+   for (let c of cards) {
+      const div = document.createElement("div");
+      //div.innerText = c.picture.img;
+      div.setAttribute("id", `card-${c.id}`);
+      div.classList.add("cardBack");
+      div.addEventListener("click", handleClick);
+      gameHtml.append(div);
+   }
 };
 
 const init = () => {
@@ -55,53 +110,8 @@ const init = () => {
 const start = () => {
    init();
    game.init();
-   let cards = game.shuffle();
-
-   for (let c of cards) {
-      const div = document.createElement("div");
-      div.innerText = c.picture.img;
-      div.setAttribute("id", `card-${c.id}`);
-      div.classList.add("cardBack");
-      div.addEventListener("click", handleClick);
-      gameHtml.append(div);
-   }
-};
-
-const handleClick = (event) => {
-   const idHtml = event.currentTarget.id;
-   const id = parseInt(idHtml.split("-")[1]);
-   if (!isSelected) {
-      displayValueCard(id);
-      removeEventCard(id);
-      result = game.checkSelectedCards(id);
-   }
-
-   if (typeof result !== "undefined" && !isSelected) {
-      isSelected = true;
-      switch (result.state) {
-         case "found":
-            isSelected = false;
-            break;
-         case "notFound":
-            for (let c of result.selectedCards) {
-               setCardToRed(c.card.id);
-            }
-            setTimeout(() => {
-               for (let c of result.selectedCards) {
-                  hideValueCard(c.card.id);
-                  addEventCard(c.card.id);
-                  isSelected = false;
-               }
-            }, 2000);
-            break;
-         case "win":
-            let endTime = Date.now();
-            let timeInSeconds = Math.floor((endTime - startTime) / 1000);
-            displayResults(result.attempts, timeInSeconds);
-            isSelected = false;
-            break;
-      }
-   }
+   const cards = game.shuffle();
+   displayGame(cards);
 };
 
 btnStartHtml.addEventListener("click", start);

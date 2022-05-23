@@ -1,64 +1,61 @@
 class Game {
    constructor(cardsNb) {
       this.cardsNb = cardsNb;
-      this.cardsArray = [];
-      this.selectedCardsArray = [];
-      this.attempts = 0;
    }
 
    init() {
+      this.cardsArray = [];
+      this.selectedCardsArray = [];
       this.cardLeft = this.cardsNb;
       this.attempts = 0;
       this.setPicturesArray();
    }
 
-   getCard(idCarte) {
-      const index = this.cardsArray.findIndex((c) => c.id === idCarte);
+   getCard(idCard) {
+      const index = this.cardsArray.findIndex((c) => c.id === idCard);
       if (index === -1) return false;
-      return this.cardsArray[index];
+      return this.cardsArray.at(index);
    }
 
-   checkSelectedCards(idCarte) {
-      this.setSelectedCardsArray(idCarte);
+   checkSelectedCards(idCard) {
+      this.setSelectedCardsArray(idCard);
       if (this.selectedCardsArray.length === 2) {
-         this.attempts += 1;
-         if (this.selectedCardsArray[0].card.picture.id === this.selectedCardsArray[1].card.picture.id) {
-            this.cardLeft -= 2;
-            result = this.setResult("found", this.selectedCardsArray, this.attempts);
-         } else {
+         this.attempts++;
+         if (this.selectedCardsArray.at(0).card.picture.id !== this.selectedCardsArray.at(1).card.picture.id) {
             result = this.setResult("notFound", this.selectedCardsArray, this.attempts);
+         } else {
+            this.cardLeft -= 2;
+            if (this.cardLeft === 0) result = this.setResult("win", this.selectedCardsArray, this.attempts);
+            else result = this.setResult("found", this.selectedCardsArray, this.attempts);
          }
          this.selectedCardsArray = [];
-         if (this.cardLeft === 0) {
-            result = this.setResult("win", this.selectedCardsArray, this.attempts);
-         }
          return result;
       }
    }
 
-   setResult(label, selectedCards, attempts) {
+   setResult(state, selectedCards, attempts) {
       return {
-         state: label,
-         selectedCards: selectedCards,
-         attempts: attempts,
+         state,
+         selectedCards,
+         attempts,
       };
    }
 
-   setSelectedCardsArray(idCarte) {
+   setSelectedCardsArray(idCard) {
       this.selectedCardsArray.push({
-         card: this.getCard(idCarte),
+         card: this.getCard(idCard),
       });
    }
 
    shuffle() {
-      this.picturesArray = this.picturesArray.sort(() => this.getRandomInt(this.picturesArray.length));
-      this.cardsArray = [];
+      this.picturesArray = this.picturesArray.sort(() => Math.random() - 0.5);
+      console.log(this.picturesArray);
       let indexPic = 0;
       let cpt = 1;
       for (let i = 0; i < this.cardsNb; i++) {
          this.cardsArray.push({
             id: i,
-            picture: this.picturesArray[indexPic],
+            picture: this.picturesArray.at(indexPic),
          });
          if (cpt === 2) {
             indexPic++;
@@ -66,7 +63,7 @@ class Game {
          }
          cpt++;
       }
-      this.cardsArray = this.cardsArray.sort(() => this.getRandomInt(5));
+      this.cardsArray = this.cardsArray.sort(() => Math.random() - 0.5);
       return this.cardsArray;
    }
 
@@ -93,7 +90,17 @@ class Game {
          {id: 17, img: "☕"},
          {id: 18, img: "🍰"},
          {id: 19, img: "🥐"},
-         {id: 20, img: "🍀"}
+         {id: 20, img: "🍀"},
+         {id: 21, img: "💦"},
+         {id: 22, img: "❓"},
+         {id: 23, img: "😎"},
+         {id: 24, img: "⛳"},
+         {id: 25, img: "🥇"},
+         {id: 26, img: "⏰"},
+         {id: 27, img: "📌"},
+         {id: 28, img: "💡"},
+         {id: 29, img: "🩹"},
+         {id: 30, img: "📸"}
       );
    }
 
